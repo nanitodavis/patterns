@@ -19,7 +19,7 @@ import org.testng.annotations.Test;
  */
 public class PoolTest {
     
-        public static final String pwd="xxxxxxxx";
+        public static final String pwd="df_qsWM_UW";
 
     @Test(expectedExceptions =org.postgresql.util.PSQLException.class,
             expectedExceptionsMessageRegExp = ".*too many connections.*"
@@ -27,9 +27,9 @@ public class PoolTest {
     public void soloDebeCrear5Conexiones() throws Exception{
         FabricaConexiones fc=new FabricaConexiones("aretico.com",5432,"software_2","grupo8_5",pwd);
         ObjectPool<Connection> pool=new GenericObjectPool<Connection>(fc);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             pool.borrowObject();           
-        }                
+        }
     }
     
     @Test
@@ -39,12 +39,16 @@ public class PoolTest {
         for (int i = 0; i < 6; i++) {
             Connection c=pool.borrowObject();
             pool.returnObject(c);
-        }                
+        }
     }
     
     @Test
-    public void quePasaCuandoSeCierraUnaConexionAntesDeRetornarla(){
-        
+    public void quePasaCuandoSeCierraUnaConexionAntesDeRetornarla() throws Exception{        
+        FabricaConexiones fc=new FabricaConexiones("aretico.com",5432,"software_2","grupo8_5",pwd);
+        ObjectPool<Connection> pool=new GenericObjectPool<Connection>(fc);
+        Connection c = pool.borrowObject();
+        c.close();
+        pool.returnObject(c);
     }
     
     @Test
