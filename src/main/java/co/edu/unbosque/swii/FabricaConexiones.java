@@ -58,6 +58,6 @@ public class FabricaConexiones implements PooledObjectFactory<Connection> {
     }
 
     public void passivateObject(PooledObject<Connection> pooledObject) throws Exception {
-        pooledObject.getObject().rollback();
+       pooledObject.getObject().rollback();
     }
 }

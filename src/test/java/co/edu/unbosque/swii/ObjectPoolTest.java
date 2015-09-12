@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public class ObjectPoolTest {
     
-    public static final String pwd="xxxxxxxx";
+    public static final String pwd="df_qsWM_UW";
 
     @Test(threadPoolSize = 1, invocationCount = 1)
     public void probandoLaCreacionDeVariasConexiones() throws Exception {
