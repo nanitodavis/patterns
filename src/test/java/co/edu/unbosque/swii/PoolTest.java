@@ -6,6 +6,7 @@
 package co.edu.unbosque.swii;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import org.apache.commons.pool2.BaseObjectPool;
 import org.apache.commons.pool2.KeyedObjectPool;
@@ -29,7 +30,7 @@ public class PoolTest {
     public void soloDebeCrear5Conexiones() throws Exception {
         FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
         ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 6; i++) {
             pool.borrowObject();
         }
     }
@@ -73,12 +74,49 @@ public class PoolTest {
     }
 
     @Test(threadPoolSize = 5, invocationCount = 5)
-    public void midaTiemposParaInsertar1000RegistrosConSingleton() {
+    public void midaTiemposParaInsertar1000RegistrosConSingleton() throws SQLException, Exception {
+        Connection sc = SingletonConnection.getConnection();
+        Statement s = sc.createStatement();
+        String nom = "a";
+        for(int cont=0;cont<1000;cont++){
+            s.execute("insert into Prueb values('"+nom+"', '"+cont+"')");
+            nom+="a";
+        }
+        long tiempoEjecucion=System.currentTimeMillis();
+        System.out.println(tiempoEjecucion);
 
     }
 
     @Test(threadPoolSize = 5, invocationCount = 5)
-    public void midaTiemposParaInsertar1000RegistrosConObjectPool() {
-
+    public void midaTiemposParaInsertar1000RegistrosConObjectPool() throws Exception {
+        FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
+        ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
+        String nom = "a";
+        for(int cont=0;cont<1000;){
+            Connection c1 = pool.borrowObject();
+            Connection c2 = pool.borrowObject();
+            Connection c3 = pool.borrowObject();
+            Connection c4 = pool.borrowObject();
+            Connection c5 = pool.borrowObject();
+            //s.execute("insert into Prueb values('"+nom+"', '"+cont+"')");
+            nom+="a";
+            pool.returnObject(c1);
+            pool.returnObject(c2);
+            pool.returnObject(c3);
+            pool.returnObject(c4);
+            pool.returnObject(c5);
+        }
+        long tiempoEjecucion=System.currentTimeMillis();
+        System.out.println(tiempoEjecucion);
+    }
+    
+    @Test
+    public void quePasaCuandoUnConnecionCreaUnaTablaSinHacerCommitYOtraLaUtilizaHaciendoCommit(){
+        
+    }
+    
+    @Test
+    public void quePasaCuandoSeIntentaRegresarUnaConnecionCreadaPorFueraDeLaFabrica(){
+        
     }
 }
