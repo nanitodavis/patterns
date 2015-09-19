@@ -27,11 +27,5 @@ public class SingletonConnection {
         }
         return connection;
 
-    }
-    
-    public Connection getConection(){
-        return connection;
-    }
-    
-    
+    }     
 }
