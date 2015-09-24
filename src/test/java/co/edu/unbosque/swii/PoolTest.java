@@ -6,6 +6,7 @@
 package co.edu.unbosque.swii;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -105,22 +106,27 @@ public class PoolTest {
     }
     
     @Test
-    public void quePasaCuandoUnConnecionCreaUnaTablaSinHacerCommitYOtraLaUtilizaHaciendoCommit(){
-        
+    public void quePasaCuandoUnaConnecionCreaUnaTablaSinHacerCommitYOtraLaUtilizaHaciendoCommit() throws Exception{
+        FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
+        ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
+        Connection c1 = pool.borrowObject();
+        c1.setAutoCommit(false);
+        Connection c2 = pool.borrowObject();
+        Statement s1 = c1.createStatement();
+        s1.execute("create table Cliente(nombre text, identificacion integer PRIMARY KEY);");
+        Statement s2 = c2.createStatement();
+        s2.execute("insert INTO Cliente Values('x', '1');");    
     }
     
     @Test
-    public void quePasaCuandoSeIntentaRegresarUnaConnecionCreadaPorFueraDeLaFabrica(){
-        
+    public void quePasaCuandoSeIntentaRegresarUnaConnecionCreadaPorFueraDeLaFabrica() throws Exception{
+        FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
+        ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
+        Connection c1 = DriverManager.getConnection("jdbc:postgresql://aretico.com:5432/software_2", "grupo8_5", pwd);
+        pool.returnObject(c1);
     }
     
     @BeforeClass
-    public void crearParaTest() throws Exception{        
-        FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
-        ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
-        for (int i = 0; i < 5; i++) {
-            pool.borrowObject();
-        }
-    }
-    
+    public void crearParaTest() throws Exception{    
+    } 
 }
