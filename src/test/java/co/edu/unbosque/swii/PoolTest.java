@@ -99,8 +99,10 @@ public class PoolTest {
         FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
         ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
         for(int cont=0;cont<1000;){
-            
+            pool.borrowObject();
         }
+        ConnectionHandler ch = new ConnectionHandler(pool);
+        ch.ingresarRegistros(1000);
         long tiempoEjecucion=System.currentTimeMillis();
         System.out.println(tiempoEjecucion);
     }
