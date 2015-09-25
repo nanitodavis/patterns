@@ -96,18 +96,21 @@ public class PoolTest {
     //@Test(threadPoolSize = 5, invocationCount = 5)
     @Test(threadPoolSize = 5)
     public void midaTiemposParaInsertar1000RegistrosConObjectPool() throws Exception {
+        long ti =System.currentTimeMillis();
         FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
         ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
+        Connection c;
         for(int cont=0;cont<1000;){
-            pool.borrowObject();
+            c=pool.borrowObject();
+            pool.returnObject(c);
         }
         ConnectionHandler ch = new ConnectionHandler(pool);
         ch.ingresarRegistros(1000);
-        long tiempoEjecucion=System.currentTimeMillis();
-        System.out.println(tiempoEjecucion);
+        long tf=System.currentTimeMillis();
+        System.out.println(tf-ti);
     }
     
-    @Test
+    @Test(expectedExceptions = org.postgresql.util.PSQLException.class)
     public void quePasaCuandoUnaConnecionCreaUnaTablaSinHacerCommitYOtraLaUtilizaHaciendoCommit() throws Exception{
         FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
         ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
@@ -120,15 +123,11 @@ public class PoolTest {
         s2.execute("insert INTO Cliente Values('x', '1');");    
     }
     
-    @Test
+    @Test (expectedExceptions = java.lang.IllegalStateException.class)
     public void quePasaCuandoSeIntentaRegresarUnaConnecionCreadaPorFueraDeLaFabrica() throws Exception{
         FabricaConexiones fc = new FabricaConexiones("aretico.com", 5432, "software_2", "grupo8_5", pwd);
         ObjectPool<Connection> pool = new GenericObjectPool<Connection>(fc);
         Connection c1 = DriverManager.getConnection("jdbc:postgresql://aretico.com:5432/software_2", "grupo8_5", pwd);
         pool.returnObject(c1);
     }
-    
-    @BeforeClass
-    public void crearParaTest() throws Exception{    
-    } 
 }

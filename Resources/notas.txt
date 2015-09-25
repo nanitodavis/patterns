@@ -1,1 +1,5 @@
-singleton 1000 datos = 97853 milliseconds
+leer y ejecutar guida accesing relational data using JDBC with Spring
+
+hacer un informe
+templates de JDBC, como se conecta a la base de datos
+mirar como utiliza singleton y object pool
